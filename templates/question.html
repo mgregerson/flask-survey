@@ -5,11 +5,14 @@
 <form action="/answer" method="POST">
   <!-- you should have one item like this for every choice -->
   {% for choice in choices %}
-  <p>
-    <input type="radio" name="answer" value="{{ choice }}" />
-    {{ choice }}
-  </p>
+    <p>
+      <input type="radio" name="choice" value="{{ choice }}" />
+      {{ choice }}
+    </p>
   {% endfor %}
+
+  <input name="question_number" value="{{ question_number }}" type="hidden">
+  <input name="total_questions" value="{{ total_questions }}" type="hidden">
 
   <button>Continue</button>
 </form>

@@ -30,5 +30,26 @@ def ask_question(question_number):
     print('question-number is', survey.questions[question_number])
     # question = survey.questions[question-number]
 
-    return render_template('question.html', question = question, choices = question.choices)
+    return render_template(
+        'question.html',
+        question = question,
+        question_number = question_number,
+        total_questions = len(survey.questions),
+        choices = question.choices)
+
+@app.post('/answer')
+def handle_answer():
+    """Adds user's answer to responses and redirects to next question or
+    thank you page if last question"""
+
+    answer = request.form["choice"]
+    question_number = int(request.form["question_number"])
+    total_questions = int(request.form["total_questions"])
+    responses.append(answer)
+    print("responses", responses)
+
+    if question_number + 1 <= total_questions - 1:
+        return redirect(f"/questions/{question_number + 1}")
+    else:
+        return redirect('/thankyou')
 
