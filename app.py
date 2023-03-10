@@ -34,6 +34,7 @@ def ask_question(question_number):
     responses = session["responses"]
 
     if len(responses) == len(survey.questions):
+        flash("You're trying to access an invalid question")
         return redirect('/completion')
 
     elif question_number == len(responses):
@@ -45,6 +46,7 @@ def ask_question(question_number):
             choices = question.choices)
 
     else:
+        flash("You're trying to access an invalid question")
         return redirect(f"/questions/{len(responses)}")
 
 @app.post('/answer')
