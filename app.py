@@ -14,13 +14,14 @@ responses = []
 def survey_start():
     """Show start of Survey"""
 
+    session["responses"] = []
     return render_template('survey_start.html', title = survey.title, instructions = survey.instructions)
 
 @app.post('/begin')
 def begin_survey():
     """Redirects the user to the start of the survey"""
 
-    responses.clear()
+    session["responses"].clear()
     return redirect('/questions/0')
 
 @app.get('/questions/<int:question_number>')
@@ -30,13 +31,21 @@ def ask_question(question_number):
     question = survey.questions[question_number]
     print('question-number is', survey.questions[question_number])
     # question = survey.questions[question-number]
+    responses = session["responses"]
 
-    return render_template(
-        'question.html',
-        question = question,
-        question_number = question_number,
-        total_questions = len(survey.questions),
-        choices = question.choices)
+    if len(responses) == len(survey.questions):
+        return redirect('/completion')
+
+    elif question_number == len(responses):
+        return render_template(
+            'question.html',
+            question = question,
+            question_number = question_number,
+            total_questions = len(survey.questions),
+            choices = question.choices)
+
+    else:
+        return redirect(f"/questions/{len(responses)}")
 
 @app.post('/answer')
 def handle_answer():
@@ -46,8 +55,12 @@ def handle_answer():
     answer = request.form["choice"]
     question_number = int(request.form["question_number"])
     total_questions = int(request.form["total_questions"])
+
+    responses = session["responses"]
     responses.append(answer)
-    print("responses", responses)
+    session["responses"] = responses
+
+    print("responses", session["responses"])
 
     if question_number + 1 <= total_questions - 1:
         return redirect(f"/questions/{question_number + 1}")
@@ -57,13 +70,13 @@ def handle_answer():
 @app.get('/completion')
 def show_answers():
     """Shows user responses to each question in the survey"""
-    
+
     questions = survey.questions
     prompts = [question.prompt for question in questions]
     length = len(prompts)
 
     return render_template(
-        'completion.html', 
-        responses = responses, 
-        prompts = prompts, 
+        'completion.html',
+        responses = session["responses"],
+        prompts = prompts,
         length = length)
