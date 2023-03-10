@@ -20,6 +20,7 @@ def survey_start():
 def begin_survey():
     """Redirects the user to the start of the survey"""
 
+    responses.clear()
     return redirect('/questions/0')
 
 @app.get('/questions/<int:question_number>')
@@ -51,5 +52,18 @@ def handle_answer():
     if question_number + 1 <= total_questions - 1:
         return redirect(f"/questions/{question_number + 1}")
     else:
-        return redirect('/thankyou')
+        return redirect('/completion')
 
+@app.get('/completion')
+def show_answers():
+    """Shows user responses to each question in the survey"""
+    
+    questions = survey.questions
+    prompts = [question.prompt for question in questions]
+    length = len(prompts)
+
+    return render_template(
+        'completion.html', 
+        responses = responses, 
+        prompts = prompts, 
+        length = length)
